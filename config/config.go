@@ -123,25 +123,41 @@ func (cfg Config) CallbackURL(path string, mergeParams ...url.Values) string {
 }
 
 // ValidReferer returns true if the URL is an allowed referer source.
-func (cfg Config) ValidReferer(reqURL, ref string) bool {
-	pubURL := cfg.PublicURL()
-	if pubURL != "" && strings.HasPrefix(ref, pubURL) {
+func (cfg Config) ValidReferer(reqURLStr, refURLStr string) bool {
+	refURL, err := url.Parse(refURLStr)
+	if err != nil {
+		return false
+	}
+	rawNormalizeURL(refURL)
+	refURLStr = refURL.String()
+
+	pubURL, _ := url.Parse(cfg.PublicURL())
+	if pubURL != nil {
+		pubURL.RawQuery = ""
+	}
+	if pubURL != nil && strings.HasPrefix(refURLStr, pubURL.String()) {
 		return true
 	}
 
+	// With no RefererURLs set, we default to host-based matching.
 	if len(cfg.Auth.RefererURLs) == 0 {
-		u, err := url.Parse(reqURL)
+		// If we match the public URL host, then we check that the scheme matches too.
+		if pubURL != nil && pubURL.Host == refURL.Host {
+			return pubURL.Scheme == refURL.Scheme
+		}
+
+		if reqURLStr == "" {
+			return false
+		}
+		reqURL, err := url.Parse(reqURLStr)
 		if err != nil {
 			return false
 		}
-		// just ensure ref is same host/scheme as req
-		u.Path = ""
-		u.RawQuery = ""
-		return strings.HasPrefix(ref, u.String())
+		return strings.ToLower(reqURL.Host) == refURL.Host
 	}
 
 	for _, u := range cfg.Auth.RefererURLs {
-		if strings.HasPrefix(ref, u) {
+		if strings.HasPrefix(refURLStr, normalizeURL(u)) {
 			return true
 		}
 	}
@@ -149,13 +165,27 @@ func (cfg Config) ValidReferer(reqURL, ref string) bool {
 	return false
 }
 
+func rawNormalizeURL(u *url.URL) {
+	u.Scheme = strings.ToLower(u.Scheme)
+	u.Host = strings.ToLower(u.Host)
+	u.Path = strings.TrimSuffix(u.Path, "/")
+}
+func normalizeURL(s string) string {
+	u, err := url.Parse(s)
+	if err != nil {
+		return s
+	}
+	rawNormalizeURL(u)
+	return u.String()
+}
+
 // PublicURL will return the General.PublicURL or a fallback address (i.e. the app listening port).
 func (cfg Config) PublicURL() string {
 	if cfg.General.PublicURL == "" {
-		return strings.TrimSuffix(cfg.fallbackURL, "/")
+		return normalizeURL(cfg.fallbackURL)
 	}
 
-	return strings.TrimSuffix(cfg.General.PublicURL, "/")
+	return normalizeURL(cfg.General.PublicURL)
 }
 
 func validateEnable(prefix string, isEnabled bool, vals ...string) error {
