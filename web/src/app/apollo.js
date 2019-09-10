@@ -125,10 +125,15 @@ export const GraphQLClient = new ApolloClient({
   },
 })
 
-window.gql = GraphQLClient
+// refetch all *active* polling queries on mutation
+const mutate = GraphQLClient.mutate
+GraphQLClient.mutate = (...args) => {
+  return mutate.call(GraphQLClient, ...args).then(result => {
+    return GraphQLClient.reFetchObservableQueries(true).then(result)
+  })
+}
 
 // Legacy client
-
 const legacyHttpLink = createHttpLink({
   uri: '/v1/graphql',
   fetch: (url, opts) => {
