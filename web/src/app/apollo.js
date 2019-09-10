@@ -129,7 +129,7 @@ export const GraphQLClient = new ApolloClient({
 const mutate = GraphQLClient.mutate
 GraphQLClient.mutate = (...args) => {
   return mutate.call(GraphQLClient, ...args).then(result => {
-    return GraphQLClient.reFetchObservableQueries(true).then(result)
+    return GraphQLClient.reFetchObservableQueries(true).then(() => result)
   })
 }
 
