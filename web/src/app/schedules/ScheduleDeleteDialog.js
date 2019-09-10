@@ -29,7 +29,6 @@ export default function ScheduleDeleteDialog(props) {
     variables: { id: props.scheduleID },
   })
   const [deleteSchedule, deleteScheduleStatus] = useMutation(mutation, {
-    refetchQueries: ['schedulesQuery'],
     variables: {
       input: [
         {

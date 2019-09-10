@@ -69,7 +69,7 @@ export function QuerySetFavoriteButton(props) {
 
 function renderMutation(isFavorite, id, typeName) {
   return (
-    <Mutation mutation={mutation} refetchQueries={[`${typeName}FavQuery`]}>
+    <Mutation mutation={mutation}>
       {mutation => renderSetFavButton(isFavorite, mutation, id, typeName)}
     </Mutation>
   )
