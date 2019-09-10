@@ -72,24 +72,6 @@ const retryLink = new RetryLink({
   },
 })
 
-const defaultHttpLink = createHttpLink({
-  uri: '/v1/graphql',
-  fetch: (url, opts) => {
-    return doFetch(opts.body)
-  },
-})
-
-// compose links
-const defaultLink = ApolloLink.from([
-  retryLink,
-  defaultHttpLink, // terminating link must be last: apollographql.com/docs/link/overview.html#terminating
-])
-
-export const LegacyGraphQLClient = new ApolloClient({
-  link: defaultLink,
-  cache: new InMemoryCache(),
-})
-
 const graphql2HttpLink = createHttpLink({
   uri: '/api/graphql',
   fetch: (url, opts) => {
@@ -140,6 +122,26 @@ export const GraphQLClient = new ApolloClient({
   cache,
   defaultOptions: {
     query: queryOpts,
-    mutate: { awaitRefetchQueries: true },
   },
+})
+
+window.gql = GraphQLClient
+
+// Legacy client
+
+const legacyHttpLink = createHttpLink({
+  uri: '/v1/graphql',
+  fetch: (url, opts) => {
+    return doFetch(opts.body)
+  },
+})
+
+const legacyLink = ApolloLink.from([
+  retryLink,
+  legacyHttpLink, // terminating link must be last: apollographql.com/docs/link/overview.html#terminating
+])
+
+export const LegacyGraphQLClient = new ApolloClient({
+  link: legacyLink,
+  cache: new InMemoryCache(),
 })
