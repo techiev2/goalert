@@ -9,6 +9,7 @@ import { authLogout } from './actions'
 
 import reduxStore from './reduxStore'
 import { POLL_INTERVAL } from './config'
+import promiseBatch from './util/promiseBatch'
 
 let pendingMutations = 0
 window.onbeforeunload = function(e) {
@@ -39,7 +40,7 @@ export function doFetch(body, url = '/v1/graphql') {
   if (body.query && body.query.startsWith && body.query.startsWith('mutation'))
     trackMutation(f)
 
-  return f.then(res => {
+  return promiseBatch(f).then(res => {
     if (res.ok) {
       return res
     }
