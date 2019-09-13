@@ -24,7 +24,7 @@ module.exports = {
     publicPath: '/',
   },
   resolve: {
-    extensions: ['.js', '.ts', '.jsx', '.css', '.scss'],
+    extensions: ['.js', '.ts', '.jsx', '.css'],
     alias: {
       'react-dom': '@hot-loader/react-dom',
     },
@@ -46,19 +46,6 @@ module.exports = {
         ],
         exclude: [/node_modules/],
         include: [APP],
-      },
-      {
-        test: /\.scss$/,
-        use: [
-          'style-loader',
-          'css-loader',
-          {
-            loader: 'sass-loader',
-            options: {
-              includePaths: ['./node_modules'],
-            },
-          },
-        ],
       },
       {
         test: /\.css$/,
@@ -97,7 +84,7 @@ module.exports = {
   },
 
   // Source maps used for debugging information
-  devtool: 'eval',
+  devtool: 'inline-source-map',
   // webpack-dev-server configuration
   devServer: {
     disableHostCheck: true,
