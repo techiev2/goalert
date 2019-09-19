@@ -3,6 +3,7 @@ import gql from 'graphql-tag'
 import { Switch, Route } from 'react-router-dom'
 
 import SimpleListPage from '../lists/SimpleListPage'
+import MockServicesList from './MockServicesList'
 import ServiceDetails from './ServiceDetails'
 import ServiceLabelList from './ServiceLabelList'
 import IntegrationKeyList from './IntegrationKeyList'
@@ -32,7 +33,9 @@ const query = gql`
 `
 
 export default class ServiceRouter extends React.PureComponent {
-  renderList = () => (
+  renderList = () => <MockServicesList />
+
+  _renderList = () => (
     <SimpleListPage
       query={query}
       variables={{ input: { favoritesFirst: true } }}
