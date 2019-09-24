@@ -112,7 +112,7 @@ export const styles = theme => ({
   searchFieldBox: {
     borderRadius: 4,
     backgroundColor: theme.palette.common.white,
-    border: '1px solid #ced4da',
+    border: '1px solid' + theme.palette.secondary['500'],
     fontSize: 16,
     padding: '10px 12px',
   },

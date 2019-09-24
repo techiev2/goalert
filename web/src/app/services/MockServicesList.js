@@ -1,22 +1,33 @@
 import React from 'react'
 import Search from '../util/Search'
-import PageActions from '../util/PageActions'
+import FilterIcon from '@material-ui/icons/FilterList'
+import IconButton from '@material-ui/core/IconButton'
 import SpeedDial from '../util/SpeedDial'
 import { VpnKey as ServiceIcon, Label as LabelIcon } from '@material-ui/icons'
 import Avatar from '@material-ui/core/Avatar'
 import Button from '@material-ui/core/Button'
+import ButtonGroup from '@material-ui/core/ButtonGroup'
 import Card from '@material-ui/core/Card'
 import Chip from '@material-ui/core/Chip'
 import List from '@material-ui/core/List'
 import ListItem from '@material-ui/core/ListItem'
 import ListItemText from '@material-ui/core/ListItemText'
 import Grid from '@material-ui/core/Grid'
+import { makeStyles } from '@material-ui/core/styles'
 import { Chance } from 'chance'
 import { ListItemSecondaryAction } from '@material-ui/core'
 import Typography from '@material-ui/core/Typography'
 const c = new Chance()
 
+const useStyles = makeStyles({
+  flex: {
+    flexGrow: 1,
+  },
+})
+
 export default function MockServicesList(props) {
+  const classes = useStyles()
+
   let services1 = []
   let services2 = []
   let services3 = []
@@ -75,20 +86,33 @@ export default function MockServicesList(props) {
 
   return (
     <React.Fragment>
-      <PageActions>
-        <Search />
-      </PageActions>
+      <Grid
+        container
+        spacing={2}
+        style={{ display: 'flex', alignItems: 'center' }}
+      >
+        <Grid item>
+          <ButtonGroup>
+            <Button>
+              <ServiceIcon style={{ marginRight: '0.5em' }} />
+              All Services
+            </Button>
+            <Button>
+              <LabelIcon style={{ marginRight: '0.5em' }} />
+              Label Groups
+            </Button>
+          </ButtonGroup>
+        </Grid>
 
-      <Grid container spacing={2}>
-        <Grid item xs={12}>
-          <Button variant='outlined' style={{ marginRight: '1.25em' }}>
-            <ServiceIcon style={{ marginRight: '0.5em' }} />
-            All Services
-          </Button>
-          <Button variant='contained'>
-            <LabelIcon style={{ marginRight: '0.5em' }} />
-            Label Groups
-          </Button>
+        <Grid item className={classes.flex} />
+
+        <Grid item>
+          <Search />
+        </Grid>
+        <Grid item>
+          <IconButton>
+            <FilterIcon />
+          </IconButton>
         </Grid>
 
         <Grid item xs={12}>
