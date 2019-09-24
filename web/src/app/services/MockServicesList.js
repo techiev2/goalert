@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import Search from '../util/Search'
 import IconButton from '@material-ui/core/IconButton'
 import SpeedDial from '../util/SpeedDial'
@@ -20,7 +20,26 @@ import { ListItemSecondaryAction } from '@material-ui/core'
 import Typography from '@material-ui/core/Typography'
 import { ServiceSelect } from '../selection/ServiceSelect'
 import FilterContainer from '../util/FilterContainer'
+import gql from 'graphql-tag'
+import QueryList from '../lists/QueryList'
 const c = new Chance()
+
+const query = gql`
+  query servicesQuery($input: ServiceSearchOptions) {
+    data: services(input: $input) {
+      nodes {
+        id
+        name
+        description
+        isFavorite
+      }
+      pageInfo {
+        hasNextPage
+        endCursor
+      }
+    }
+  }
+`
 
 const useStyles = makeStyles({
   flex: {
@@ -30,6 +49,7 @@ const useStyles = makeStyles({
 
 export default function MockServicesList() {
   const classes = useStyles()
+  const [showServicesToggle, setShowServicesToggle] = useState(true)
 
   let services1 = []
   let services2 = []
@@ -92,11 +112,11 @@ export default function MockServicesList() {
       >
         <Grid item>
           <ButtonGroup>
-            <Button>
+            <Button onClick={() => setShowServicesToggle(true)}>
               <ServiceIcon style={{ marginRight: '0.5em' }} />
               All Services
             </Button>
-            <Button>
+            <Button onClick={() => setShowServicesToggle(false)}>
               <LabelIcon style={{ marginRight: '0.5em' }} />
               Label Groups
             </Button>
@@ -131,145 +151,7 @@ export default function MockServicesList() {
           </IconButton>
         </Grid>
 
-        <Grid item xs={12}>
-          <Typography
-            component='h2'
-            color='textSecondary'
-            variant='h5'
-            style={{ marginBottom: '0.25em' }}
-          >
-            {labelVal1}
-          </Typography>
-          <Card>
-            <List>
-              {services1.map(service => (
-                <ListItem button key={service.id}>
-                  <ListItemText
-                    primary={service.name}
-                    secondary={service.description}
-                  />
-                  {service.label && (
-                    <ListItemSecondaryAction>
-                      <Chip
-                        avatar={
-                          <Avatar>
-                            <LabelIcon />
-                          </Avatar>
-                        }
-                        label={service.label.key}
-                      />
-                    </ListItemSecondaryAction>
-                  )}
-                </ListItem>
-              ))}
-            </List>
-          </Card>
-        </Grid>
-
-        <Grid item xs={12}>
-          <Typography
-            component='h2'
-            color='textSecondary'
-            variant='h5'
-            style={{ marginBottom: '0.25em' }}
-          >
-            {labelVal2}
-          </Typography>
-          <Card>
-            <List>
-              {services2.map(service => (
-                <ListItem button key={service.id}>
-                  <ListItemText
-                    primary={service.name}
-                    secondary={service.description}
-                  />
-                  {service.label && (
-                    <ListItemSecondaryAction>
-                      <Chip
-                        avatar={
-                          <Avatar>
-                            <LabelIcon />
-                          </Avatar>
-                        }
-                        label={service.label.key}
-                      />
-                    </ListItemSecondaryAction>
-                  )}
-                </ListItem>
-              ))}
-            </List>
-          </Card>
-        </Grid>
-
-        <Grid item xs={12}>
-          <Typography
-            component='h2'
-            color='textSecondary'
-            variant='h5'
-            style={{ marginBottom: '0.25em' }}
-          >
-            {labelVal3}
-          </Typography>
-          <Card>
-            <List>
-              {services3.map(service => (
-                <ListItem button key={service.id}>
-                  <ListItemText
-                    primary={service.name}
-                    secondary={service.description}
-                  />
-                  {service.label && (
-                    <ListItemSecondaryAction>
-                      <Chip
-                        avatar={
-                          <Avatar>
-                            <LabelIcon />
-                          </Avatar>
-                        }
-                        label={service.label.key}
-                      />
-                    </ListItemSecondaryAction>
-                  )}
-                </ListItem>
-              ))}
-            </List>
-          </Card>
-        </Grid>
-
-        <Grid item xs={12}>
-          <Typography
-            component='h2'
-            color='textSecondary'
-            variant='h5'
-            style={{ marginBottom: '0.25em' }}
-          >
-            No Labels
-          </Typography>
-          <Card>
-            <List>
-              {services4.map(service => (
-                <ListItem button key={service.id}>
-                  <ListItemText
-                    primary={service.name}
-                    secondary={service.description}
-                  />
-                  {service.label && (
-                    <ListItemSecondaryAction>
-                      <Chip
-                        avatar={
-                          <Avatar>
-                            <LabelIcon />
-                          </Avatar>
-                        }
-                        label={service.label.key}
-                      />
-                    </ListItemSecondaryAction>
-                  )}
-                </ListItem>
-              ))}
-            </List>
-          </Card>
-        </Grid>
+        {renderContent()}
 
         <Grid item className={classes.flex} />
 
@@ -302,4 +184,165 @@ export default function MockServicesList() {
       />
     </React.Fragment>
   )
+
+  function renderContent() {
+    if (showServicesToggle) {
+      return (
+        <QueryList
+          query={query}
+          variables={{ input: { favoritesFirst: true } }}
+          mapDataNode={n => ({
+            title: n.name,
+            subText: n.description,
+            url: n.id,
+            isFavorite: n.isFavorite,
+          })}
+        />
+      )
+    } else {
+      return (
+        <React.Fragment>
+          <Grid item xs={12}>
+            <Typography
+              component='h2'
+              color='textSecondary'
+              variant='h5'
+              style={{ marginBottom: '0.25em' }}
+            >
+              {labelVal1}
+            </Typography>
+            <Card>
+              <List>
+                {services1.map(service => (
+                  <ListItem button key={service.id}>
+                    <ListItemText
+                      primary={service.name}
+                      secondary={service.description}
+                    />
+                    {service.label && (
+                      <ListItemSecondaryAction>
+                        <Chip
+                          avatar={
+                            <Avatar>
+                              <LabelIcon />
+                            </Avatar>
+                          }
+                          label={service.label.key}
+                        />
+                      </ListItemSecondaryAction>
+                    )}
+                  </ListItem>
+                ))}
+              </List>
+            </Card>
+          </Grid>
+
+          <Grid item xs={12}>
+            <Typography
+              component='h2'
+              color='textSecondary'
+              variant='h5'
+              style={{ marginBottom: '0.25em' }}
+            >
+              {labelVal2}
+            </Typography>
+            <Card>
+              <List>
+                {services2.map(service => (
+                  <ListItem button key={service.id}>
+                    <ListItemText
+                      primary={service.name}
+                      secondary={service.description}
+                    />
+                    {service.label && (
+                      <ListItemSecondaryAction>
+                        <Chip
+                          avatar={
+                            <Avatar>
+                              <LabelIcon />
+                            </Avatar>
+                          }
+                          label={service.label.key}
+                        />
+                      </ListItemSecondaryAction>
+                    )}
+                  </ListItem>
+                ))}
+              </List>
+            </Card>
+          </Grid>
+
+          <Grid item xs={12}>
+            <Typography
+              component='h2'
+              color='textSecondary'
+              variant='h5'
+              style={{ marginBottom: '0.25em' }}
+            >
+              {labelVal3}
+            </Typography>
+            <Card>
+              <List>
+                {services3.map(service => (
+                  <ListItem button key={service.id}>
+                    <ListItemText
+                      primary={service.name}
+                      secondary={service.description}
+                    />
+                    {service.label && (
+                      <ListItemSecondaryAction>
+                        <Chip
+                          avatar={
+                            <Avatar>
+                              <LabelIcon />
+                            </Avatar>
+                          }
+                          label={service.label.key}
+                        />
+                      </ListItemSecondaryAction>
+                    )}
+                  </ListItem>
+                ))}
+              </List>
+            </Card>
+          </Grid>
+
+          <Grid item xs={12}>
+            <Typography
+              component='h2'
+              color='textSecondary'
+              variant='h5'
+              style={{ marginBottom: '0.25em' }}
+            >
+              No Labels
+            </Typography>
+            <Card>
+              <List>
+                {services4.map(service => (
+                  <ListItem button key={service.id}>
+                    <ListItemText
+                      primary={service.name}
+                      secondary={service.description}
+                    />
+                    {service.label && (
+                      <ListItemSecondaryAction>
+                        <Chip
+                          avatar={
+                            <Avatar>
+                              <LabelIcon />
+                            </Avatar>
+                          }
+                          label={service.label.key}
+                        />
+                      </ListItemSecondaryAction>
+                    )}
+                  </ListItem>
+                ))}
+              </List>
+            </Card>
+          </Grid>
+        </React.Fragment>
+      )
+    }
+  }
 }
