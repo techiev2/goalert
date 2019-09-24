@@ -41,11 +41,14 @@ const query = gql`
   }
 `
 
-const useStyles = makeStyles({
+const useStyles = makeStyles(theme => ({
   flex: {
     flexGrow: 1,
   },
-})
+  activeButton: {
+    boxShadow: 'inset 0px 0px 5px ' + theme.palette.secondary['500'],
+  },
+}))
 
 export default function MockServicesList() {
   const classes = useStyles()
@@ -112,11 +115,17 @@ export default function MockServicesList() {
       >
         <Grid item>
           <ButtonGroup>
-            <Button onClick={() => setShowServicesToggle(true)}>
+            <Button
+              className={showServicesToggle ? classes.activeButton : null}
+              onClick={() => setShowServicesToggle(true)}
+            >
               <ServiceIcon style={{ marginRight: '0.5em' }} />
               All Services
             </Button>
-            <Button onClick={() => setShowServicesToggle(false)}>
+            <Button
+              className={showServicesToggle ? null : classes.activeButton}
+              onClick={() => setShowServicesToggle(false)}
+            >
               <LabelIcon style={{ marginRight: '0.5em' }} />
               Label Groups
             </Button>
