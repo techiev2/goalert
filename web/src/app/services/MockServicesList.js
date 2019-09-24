@@ -1,8 +1,9 @@
 import React from 'react'
 import Search from '../util/Search'
-import FilterIcon from '@material-ui/icons/FilterList'
 import IconButton from '@material-ui/core/IconButton'
 import SpeedDial from '../util/SpeedDial'
+import Right from '@material-ui/icons/ChevronRight'
+import Left from '@material-ui/icons/ChevronLeft'
 import { VpnKey as ServiceIcon, Label as LabelIcon } from '@material-ui/icons'
 import Avatar from '@material-ui/core/Avatar'
 import Button from '@material-ui/core/Button'
@@ -17,6 +18,8 @@ import { makeStyles } from '@material-ui/core/styles'
 import { Chance } from 'chance'
 import { ListItemSecondaryAction } from '@material-ui/core'
 import Typography from '@material-ui/core/Typography'
+import { ServiceSelect } from '../selection/ServiceSelect'
+import FilterContainer from '../util/FilterContainer'
 const c = new Chance()
 
 const useStyles = makeStyles({
@@ -25,7 +28,7 @@ const useStyles = makeStyles({
   },
 })
 
-export default function MockServicesList(props) {
+export default function MockServicesList() {
   const classes = useStyles()
 
   let services1 = []
@@ -33,51 +36,47 @@ export default function MockServicesList(props) {
   let services3 = []
   let services4 = []
 
-  const labelKey1 = 'Measurement'
-  const labelKey2 = 'Platform Engineering'
-  const labelKey3 = 'ENI/ENO'
+  const key = 'servicenow/AssignmentGroup'
+  const labelVal1 = 'Engineering Practices - Measurement'
+  const labelVal2 = 'Solution Portfolio - Merch'
+  const labelVal3 = 'ENG - Client Tech'
 
   for (let i = 0; i < 5; i++) {
     services1.push({
+      id: c.guid(),
       name: c.word({ capitalize: true }) + ' ' + c.word({ capitalize: true }),
       description: c.sentence(),
       label: {
-        key: labelKey1,
-        value: c.word({
-          length: c.integer({ min: 4, max: 7 }),
-          capitalize: true,
-        }),
+        key,
+        value: labelVal1,
       },
     })
   }
   for (let i = 0; i < 3; i++) {
     services2.push({
+      id: c.guid(),
       name: c.word({ capitalize: true }) + ' ' + c.word({ capitalize: true }),
       description: c.sentence(),
       label: {
-        key: labelKey2,
-        value: c.word({
-          length: c.integer({ min: 4, max: 7 }),
-          capitalize: true,
-        }),
+        key,
+        value: labelVal2,
       },
     })
   }
   for (let i = 0; i < 4; i++) {
     services3.push({
+      id: c.guid(),
       name: c.word({ capitalize: true }) + ' ' + c.word({ capitalize: true }),
       description: c.sentence(),
       label: {
-        key: labelKey3,
-        value: c.word({
-          length: c.integer({ min: 4, max: 7 }),
-          capitalize: true,
-        }),
+        key,
+        value: labelVal3,
       },
     })
   }
   for (let i = 0; i < 5; i++) {
     services4.push({
+      id: c.guid(),
       name: c.word({ capitalize: true }) + ' ' + c.word({ capitalize: true }),
       description: c.sentence(),
       label: null,
@@ -107,11 +106,28 @@ export default function MockServicesList(props) {
         <Grid item className={classes.flex} />
 
         <Grid item>
-          <Search />
+          <FilterContainer>
+            <Grid item xs={12}>
+              <ServiceSelect label='Select label key' />
+            </Grid>
+            <Grid item xs={12}>
+              <ServiceSelect label='Select label value' />
+            </Grid>
+          </FilterContainer>
+        </Grid>
+
+        <Grid item>
+          <Search placeholder='Search services' />
+        </Grid>
+
+        <Grid item>
+          <IconButton>
+            <Left />
+          </IconButton>
         </Grid>
         <Grid item>
           <IconButton>
-            <FilterIcon />
+            <Right />
           </IconButton>
         </Grid>
 
@@ -122,12 +138,12 @@ export default function MockServicesList(props) {
             variant='h5'
             style={{ marginBottom: '0.25em' }}
           >
-            {labelKey1}
+            {labelVal1}
           </Typography>
           <Card>
             <List>
               {services1.map(service => (
-                <ListItem button>
+                <ListItem button key={service.id}>
                   <ListItemText
                     primary={service.name}
                     secondary={service.description}
@@ -140,7 +156,7 @@ export default function MockServicesList(props) {
                             <LabelIcon />
                           </Avatar>
                         }
-                        label={service.label.value}
+                        label={service.label.key}
                       />
                     </ListItemSecondaryAction>
                   )}
@@ -157,12 +173,12 @@ export default function MockServicesList(props) {
             variant='h5'
             style={{ marginBottom: '0.25em' }}
           >
-            {labelKey2}
+            {labelVal2}
           </Typography>
           <Card>
             <List>
               {services2.map(service => (
-                <ListItem button>
+                <ListItem button key={service.id}>
                   <ListItemText
                     primary={service.name}
                     secondary={service.description}
@@ -175,7 +191,7 @@ export default function MockServicesList(props) {
                             <LabelIcon />
                           </Avatar>
                         }
-                        label={service.label.value}
+                        label={service.label.key}
                       />
                     </ListItemSecondaryAction>
                   )}
@@ -192,12 +208,12 @@ export default function MockServicesList(props) {
             variant='h5'
             style={{ marginBottom: '0.25em' }}
           >
-            {labelKey3}
+            {labelVal3}
           </Typography>
           <Card>
             <List>
               {services3.map(service => (
-                <ListItem button>
+                <ListItem button key={service.id}>
                   <ListItemText
                     primary={service.name}
                     secondary={service.description}
@@ -210,7 +226,7 @@ export default function MockServicesList(props) {
                             <LabelIcon />
                           </Avatar>
                         }
-                        label={service.label.value}
+                        label={service.label.key}
                       />
                     </ListItemSecondaryAction>
                   )}
@@ -232,7 +248,7 @@ export default function MockServicesList(props) {
           <Card>
             <List>
               {services4.map(service => (
-                <ListItem button>
+                <ListItem button key={service.id}>
                   <ListItemText
                     primary={service.name}
                     secondary={service.description}
@@ -245,7 +261,7 @@ export default function MockServicesList(props) {
                             <LabelIcon />
                           </Avatar>
                         }
-                        label={service.label.value}
+                        label={service.label.key}
                       />
                     </ListItemSecondaryAction>
                   )}
@@ -253,6 +269,19 @@ export default function MockServicesList(props) {
               ))}
             </List>
           </Card>
+        </Grid>
+
+        <Grid item className={classes.flex} />
+
+        <Grid item>
+          <IconButton>
+            <Left />
+          </IconButton>
+        </Grid>
+        <Grid item>
+          <IconButton>
+            <Right />
+          </IconButton>
         </Grid>
       </Grid>
 

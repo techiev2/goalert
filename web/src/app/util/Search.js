@@ -25,7 +25,7 @@ const useStyles = makeStyles(theme => {
  *
  * On a larger screen, the field will always be present to use in the app bar.
  */
-export default function Search() {
+export default function Search(props) {
   const searchParam = useSelector(searchSelector)
   const dispatch = useDispatch()
   const setSearchParam = value => dispatch(setURLParam('search', value))
@@ -56,7 +56,7 @@ export default function Search() {
             input: classes.searchFieldBox,
           },
         }}
-        placeholder='Search'
+        placeholder={props.placeholder || 'Search'}
         onChange={e => setSearch(e.target.value)}
         value={search}
         {...extraProps}
