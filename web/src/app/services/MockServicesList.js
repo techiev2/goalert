@@ -10,6 +10,7 @@ import Button from '@material-ui/core/Button'
 import ButtonGroup from '@material-ui/core/ButtonGroup'
 import Card from '@material-ui/core/Card'
 import Chip from '@material-ui/core/Chip'
+import FormHelperText from '@material-ui/core/FormHelperText'
 import List from '@material-ui/core/List'
 import ListItem from '@material-ui/core/ListItem'
 import ListItemText from '@material-ui/core/ListItemText'
@@ -138,9 +139,11 @@ export default function MockServicesList() {
           <FilterContainer>
             <Grid item xs={12}>
               <ServiceSelect label='Select label key' />
+              <FormHelperText>Filter by label keys</FormHelperText>
             </Grid>
             <Grid item xs={12}>
               <ServiceSelect label='Select label value' />
+              <FormHelperText>Filter by label values</FormHelperText>
             </Grid>
           </FilterContainer>
         </Grid>
