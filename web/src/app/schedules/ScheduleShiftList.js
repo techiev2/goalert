@@ -67,6 +67,7 @@ const mapQueryToProps = ({ data }) => {
     })),
   }
 }
+
 const mapPropsToQueryProps = ({ scheduleID, start, end }) => ({
   variables: {
     id: scheduleID,
@@ -78,13 +79,15 @@ const mapPropsToQueryProps = ({ scheduleID, start, end }) => ({
 const mapStateToProps = state => {
   const duration = urlParamSelector(state)('duration', 'P14D')
   const zone = urlParamSelector(state)('tz', 'local')
+
   let start = urlParamSelector(state)(
     'start',
     DateTime.fromObject({ zone })
       .startOf('day')
-      .toISO(),
+      .toISO(), // default is today if none specified
   )
 
+  // switch start to right now
   const activeOnly = urlParamSelector(state)('activeOnly', false)
   if (activeOnly) {
     start = DateTime.fromObject({ zone }).toISO()
@@ -194,22 +197,29 @@ export default class ScheduleShiftList extends React.PureComponent {
     )
 
     const result = []
+
     displaySpan.splitBy({ days: 1 }).forEach(day => {
       const dayShifts = shifts.filter(s => day.overlaps(s.interval))
+
       if (!dayShifts.length) return
+
       result.push({
         subHeader: relativeDate(day.start),
       })
+
       dayShifts.forEach(s => {
         let shiftDetails = ''
+
         const startTime = s.start.toLocaleString({
           hour: 'numeric',
           minute: 'numeric',
         })
+
         const endTime = s.end.toLocaleString({
           hour: 'numeric',
           minute: 'numeric',
         })
+
         if (s.interval.engulfs(day)) {
           // shift (s.interval) spans all day
           shiftDetails = 'All day'
@@ -224,6 +234,7 @@ export default class ScheduleShiftList extends React.PureComponent {
           // shift starts and continues on for the rest of the day
           shiftDetails = `Active after ${startTime}`
         }
+
         result.push({
           title: s.userName,
           subText: shiftDetails,
@@ -267,6 +278,7 @@ export default class ScheduleShiftList extends React.PureComponent {
         </TextField>
       )
     }
+
     return (
       <TextField
         fullWidth
@@ -303,6 +315,7 @@ export default class ScheduleShiftList extends React.PureComponent {
             zone,
           },
         ).toLocaleString()} in ${zoneText}.`
+
     return (
       <React.Fragment>
         <PageActions>
