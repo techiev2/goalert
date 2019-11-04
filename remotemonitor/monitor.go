@@ -50,7 +50,7 @@ func NewMonitor(cfg Config) (*Monitor, error) {
 	if err != nil {
 		return nil, err
 	}
-	h := twilio.WrapValidation(m, m.tw)
+	h := twilio.WrapValidation(m)
 	mux := http.NewServeMux()
 	mux.HandleFunc("/health", func(w http.ResponseWriter, req *http.Request) { io.WriteString(w, "ok") })
 	m.appCfg.General.PublicURL = cfg.PublicURL

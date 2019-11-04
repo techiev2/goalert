@@ -37,7 +37,7 @@ func validateRequest(req *http.Request) error {
 }
 
 // WrapValidation will wrap an http.Handler to do X-Twilio-Signature checking.
-func WrapValidation(h http.Handler, c Config) http.Handler {
+func WrapValidation(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		ctx := req.Context()
 
