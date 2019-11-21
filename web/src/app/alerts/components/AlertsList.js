@@ -149,10 +149,12 @@ export default class AlertsList extends Component {
 
   // TODO: Temp fix until apollo cache updated after all relevant mutations affecting this component
   componentDidMount() {
+    this._mounted = true
     this.refetch()
   }
 
   componentWillUnmount() {
+    this._mounted = false
     this.refetch.cancel()
   }
 
@@ -240,6 +242,11 @@ export default class AlertsList extends Component {
     )
   }
 
+  handleLoadMore = args => {
+    if (!this._mounted) return
+    this.props.loadMore(args)
+  }
+
   render() {
     const {
       actionComplete,
@@ -249,7 +256,6 @@ export default class AlertsList extends Component {
       fullScreen,
       onServicePage,
       isFirstLogin,
-      loadMore,
       serviceID,
     } = this.props
     const { snackbarOpen } = this.state
@@ -332,7 +338,7 @@ export default class AlertsList extends Component {
           </Hidden>
           <List id='alerts-list' style={{ padding: 0 }} data-cy='alerts-list'>
             <InfiniteScroll
-              next={() => loadMore(this.getQueryData(offset))}
+              next={() => this.handleLoadMore(this.getQueryData(offset))}
               dataLength={len}
               hasMore={hasMore}
               loader={null}
