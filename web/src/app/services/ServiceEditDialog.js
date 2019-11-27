@@ -1,6 +1,5 @@
 import React, { useState } from 'react'
 import p from 'prop-types'
-
 import gql from 'graphql-tag'
 import { useQuery, useMutation } from 'react-apollo'
 import { fieldErrors, nonFieldErrors } from '../util/errutil'
@@ -22,6 +21,7 @@ const query = gql`
     }
   }
 `
+
 const mutation = gql`
   mutation updateService($input: UpdateServiceInput!) {
     updateService(input: $input)
@@ -33,7 +33,7 @@ export default function ServiceEditDialog({ serviceID, onClose }) {
   const { data, ...dataStatus } = useQuery(query, {
     variables: { id: serviceID },
   })
-  const [save, saveStatus] = useMutation(mutation, {
+  const [updateService, updateServiceStatus] = useMutation(mutation, {
     variables: { input: { ...value, id: serviceID } },
     onCompleted: onClose,
   })
@@ -47,23 +47,25 @@ export default function ServiceEditDialog({ serviceID, onClose }) {
     escalationPolicyID: _.get(data, 'service.ep.id'),
   }
 
-  const fieldErrs = fieldErrors(saveStatus.error)
+  const fieldErrs = fieldErrors(updateServiceStatus.error)
 
   return (
     <FormDialog
       title='Edit Service'
-      loading={saveStatus.loading || dataStatus.loading}
-      errors={nonFieldErrors(saveStatus.error).concat(
+      loading={updateServiceStatus.loading || dataStatus.loading}
+      errors={nonFieldErrors(updateServiceStatus.error).concat(
         nonFieldErrors(dataStatus.error),
       )}
       onClose={onClose}
-      onSubmit={() => save()}
+      onSubmit={() => updateService()}
       form={
         <ServiceForm
           epRequired
           errors={fieldErrs}
           disabled={Boolean(
-            saveStatus.loading || dataStatus.loading || dataStatus.error,
+            updateServiceStatus.loading ||
+              dataStatus.loading ||
+              dataStatus.error,
           )}
           value={value || defaults}
           onChange={value => setValue(value)}
@@ -72,6 +74,7 @@ export default function ServiceEditDialog({ serviceID, onClose }) {
     />
   )
 }
+
 ServiceEditDialog.propTypes = {
   serviceID: p.string.isRequired,
   onClose: p.func,

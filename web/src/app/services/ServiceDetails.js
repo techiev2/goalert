@@ -70,18 +70,26 @@ const alertStatus = a => {
 }
 
 export default function ServiceDetails({ serviceID }) {
-  const [showEdit, setShowEdit] = useState(false)
-  const [showDelete, setShowDelete] = useState(false)
-  const { data, loading, error } = useQuery(query, {
+  const [showEditDialog, setShowEditDialog] = useState(false)
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false)
+
+  const { loading, error, data } = useQuery(query, {
     variables: { serviceID },
     returnPartialData: true,
   })
 
+  const service = _.get(data, 'service', null)
+  const alerts = _.get(data, 'alerts.nodes', null)
+
   if (loading) return <Spinner />
   if (error) return <GenericError error={error.message} />
 
-  if (!_.get(data, 'service.id')) {
-    return showDelete ? <Redirect to='/services' push /> : <ObjectNotFound />
+  if (!service) {
+    return showDeleteDialog ? (
+      <Redirect to='/services' push />
+    ) : (
+      <ObjectNotFound />
+    )
   }
 
   return (
@@ -92,24 +100,24 @@ export default function ServiceDetails({ serviceID }) {
           actions={[
             {
               label: 'Edit Service',
-              onClick: () => setShowEdit(true),
+              onClick: () => setShowEditDialog(true),
             },
             {
               label: 'Delete Service',
-              onClick: () => setShowDelete(true),
+              onClick: () => setShowDeleteDialog(true),
             },
           ]}
         />
       </PageActions>
       <DetailsPage
-        title={data.service.name}
-        details={data.service.description}
+        title={service.name}
+        details={service.description}
         titleFooter={
           <div>
             Escalation Policy:{' '}
-            {_.get(data, 'service.ep') ? (
-              <Link to={`/escalation-policies/${data.service.ep.id}`}>
-                {data.service.ep.name}
+            {service.ep ? (
+              <Link to={`/escalation-policies/${service.ep.id}`}>
+                {service.ep.name}
               </Link>
             ) : (
               <Spinner text='Looking up policy...' />
@@ -119,28 +127,28 @@ export default function ServiceDetails({ serviceID }) {
         links={[
           {
             label: 'Alerts',
-            status: alertStatus(_.get(data, 'alerts.nodes')),
+            status: alertStatus(alerts),
             url: 'alerts',
           },
           {
             label: 'Heartbeat Monitors',
             url: 'heartbeat-monitors',
-            status: hbStatus(_.get(data, 'service.heartbeatMonitors')),
+            status: hbStatus(service.heartbeatMonitors),
           },
           { label: 'Integration Keys', url: 'integration-keys' },
           { label: 'Labels', url: 'labels' },
         ]}
         pageFooter={<ServiceOnCallList serviceID={serviceID} />}
       />
-      {showEdit && (
+      {showEditDialog && (
         <ServiceEditDialog
-          onClose={() => setShowEdit(false)}
+          onClose={() => setShowEditDialog(false)}
           serviceID={serviceID}
         />
       )}
-      {showDelete && (
+      {showDeleteDialog && (
         <ServiceDeleteDialog
-          onClose={() => setShowDelete(false)}
+          onClose={() => setShowDeleteDialog(false)}
           serviceID={serviceID}
         />
       )}
